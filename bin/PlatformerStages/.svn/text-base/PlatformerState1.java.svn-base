@@ -1,0 +1,348 @@
+package PlatformerStages;
+
+import Entity.*;
+import Entity.Enemies.*;
+import GameState.*;
+import Main.GamePanel;
+import TileMap.*;
+import Audio.AudioPlayer;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class PlatformerState1 extends GameState{
+
+		private Player player;
+		private int courseNumber;
+		private int grade = 100;
+		
+		private Timer gradeTimer;
+		private int initialDelay = 0;
+		private int delay = 1000;
+		
+		
+		private ArrayList<Enemy> enemies;
+		private ArrayList<Enemy> pickups;
+		
+		private ArrayList<Explosion> explosions;
+		private String[] explosionPath = {"/Sprites/Enemies/enemyDeath.gif", "/Sprites/Enemies/pickupBonus.gif"};
+		
+		private TileMap tileMap;
+		private Background bg;
+	
+		private AudioPlayer bgMusic;
+		private String character;
+
+		private ArrayList<int[]> enemyObjects;
+		private boolean skipSplash = false;
+		private boolean levelFinished = false;
+		private Font font;
+		private Font hudFont;
+		private Font levelFinishedFont;
+		
+		private boolean locked = false;
+		
+		private int hudsection = GamePanel.WIDTH / 8;
+		
+		private int[][] attributes;
+		private int gradeDecrementRate = 5;
+		private int gradeIncrementRate = 3;
+		private int gradeTimeDecrement = 1;
+		private ArrayList<Door> doors;
+		private boolean lockPlayer;
+		
+		private int startX;
+		private int startY;
+		
+		public PlatformerState1(GameStateManager gsm, String c, int n, int[][] attributes){
+			this.attributes = attributes;
+			courseNumber = n;
+			this.gsm = gsm;
+			character = c;
+			init();
+			
+		}
+		
+		
+		public  void init() {
+			
+			//Load map and tileset for level
+			tileMap = new TileMap(gsm.getPlatformerMap(gsm.getPlatformerCourse()-1),gsm.getTileset(gsm.getPlatformerCourse()-1));
+			tileMap.setPosition(0, 0);
+			enemyObjects = tileMap.getObjects();
+			
+			tileMap.setTween(1);
+			
+			//deduct grade if penalty from transition
+			grade = 100 - gsm.getPenalty();
+			
+			bg = new Background(gsm.getBackgrounds(gsm.getPlatformerCourse()-1), 0.5);
+			
+			populateEnemies();
+			
+			explosions = new ArrayList<Explosion>();
+			hudFont = new Font ("Arial", Font.PLAIN, 9);
+			levelFinishedFont = new Font ("Arial", Font.PLAIN, 14);
+
+			gradeTimer = new Timer();
+			gradeTimer.scheduleAtFixedRate(new TimerTask() {
+				public void run() {
+					gradeInterval();
+				}
+
+
+			}, initialDelay, delay);
+			
+		}
+		
+		
+		private void gradeInterval() {
+			if (grade <= 0){
+				levelFinished = true;
+			}
+			grade-=gradeTimeDecrement;
+		}
+		
+		private void populateEnemies(){
+			enemies = new ArrayList<Enemy>();
+			doors = new ArrayList<Door>();
+			pickups = new ArrayList<Enemy>();
+			for ( int[] o: enemyObjects ){
+				switch (o[0])
+				{
+				case 40: TriangleHead s = new TriangleHead(tileMap);
+						s.setPosition(o[1], o[2]);
+						enemies.add(s);
+						break;
+				case 28: Pickup p = new Pickup(tileMap);
+						p.setPosition(o[1] + tileMap.getTileSize() /2, o[2] + tileMap.getTileSize() /2);
+						enemies.add(p);
+						break;	
+				
+				case 29: Door d = new Door(tileMap, 10);
+						d.setPosition(o[1] + tileMap.getTileSize() /2, o[2] + tileMap.getTileSize() /2);
+						d.setOpen(true);
+						doors.add(d);
+						break;
+						
+				case 30:player = new Player(tileMap, character, attributes);
+						startX = o[1]  + tileMap.getTileSize() /2;
+						startY = o[2]  + tileMap.getTileSize() /2;
+						player.setPosition(startX, startY);
+						break;
+				case 31:CreepyGuy c = new CreepyGuy(tileMap);
+						c.setPosition(o[1], o[2]);
+						enemies.add(c);
+						break;
+				case 32:Slime slime = new Slime(tileMap);
+							slime.setPosition(o[1], o[2]);
+							enemies.add(slime);
+							break;
+				}
+			}
+		}
+
+		
+		public  void update() {
+			//update player
+			player.update();
+			tileMap.setPosition(
+					GamePanel.WIDTH / 2 - player.getx(),
+					GamePanel.HEIGHT / 2 - player.gety()
+				);
+
+			//set background
+			
+			bg.setPosition(tileMap.getx(), tileMap.gety());
+			
+			//attack enemies
+			player.checkAttack(enemies);
+			if (player.isHitOnce() && !player.isHitPickUp() && !levelFinished){
+				grade -= gradeDecrementRate;
+				player.setHitOnce(false);
+				if (grade <= 0){
+					grade = 0;
+					levelFinished = true;
+				}
+				
+			}
+			
+			if (grade <= 0){
+				grade = 0;
+				levelFinished = true;
+				lockPlayer = true;
+			}
+			
+			if (player.isHitOnce() && player.isHitPickUp()){
+				grade += gradeIncrementRate;
+				player.setHitOnce(false);	
+				if (grade > 100){
+					grade = 100;
+				}
+			}
+		
+			//update all enemies
+
+			for (int i = 0; i < enemies.size(); i++){
+				Enemy e = enemies.get(i);
+				if (e.gety() > tileMap.getHeight() - (2*tileMap.getTileSize())) {e.hit(0.1);}
+				if(e.isDead()){
+					enemies.remove(i);
+					i--;
+					if (!e.isPickUp()) {
+						explosions.add(new Explosion(e.getx(), e.gety(), explosionPath[0]));
+					}
+					else{
+						explosions.add(new Explosion(e.getx(), e.gety(), explosionPath[1]));
+					}
+				}
+				
+			}
+			for (Door d: doors){
+				d.setMapPosition();
+				d.update();
+				
+				if (player.intersects(d) && d.isOpen()){
+
+					gradeTimer.cancel();
+					
+					lockPlayer = true;
+					player.stayStill();
+					d.isTriggered();
+					d.update();
+					
+					if (d.getCurrentState()){						
+						levelFinished = true;
+						d.setOpen(false);
+					}
+				}
+
+			}
+			
+			if (skipSplash){
+				gsm.setState(GameStateManager.TRANSITIONSTATE1);
+			}
+			
+			for (Enemy e: enemies){
+				e.setMapPosition();
+				e.update();
+			}
+			
+			//update explosions;
+			for (int i = 0; i < explosions.size(); i ++){
+				explosions.get(i).update();
+				if (explosions.get(i).shouldRemove()){
+					explosions.remove(i);
+					i--;
+					
+				}
+			}
+			
+			//if player reaches bottom of screen, decrement score and reposition player from beginning
+			if (player.gety() > tileMap.getHeight() - (2*tileMap.getTileSize() )) {
+				
+				player.setPosition(startX, startY);
+				player.setMapPosition();
+				
+				grade -= gradeDecrementRate;
+				player.update();
+			}
+			
+		}
+			
+
+		public  void draw(Graphics2D g) {
+			
+			//draw bg
+			bg.draw(g);
+			//draw tilemap
+			tileMap.draw(g);
+			
+			for (Door d: doors){
+				if (d.isOpen()) {d.draw(g, 1);}
+			}
+			player.draw(g);
+			
+			for (Enemy e: enemies){
+				e.draw(g, 1);
+			}
+
+			// draw explosions
+			for (int i = 0; i < explosions.size(); i ++){
+				explosions.get(i).setMapPosition((int)tileMap.getx(),(int) tileMap.gety());
+				explosions.get(i).draw(g);
+			}
+			
+			g.setColor(Color.black);
+			g.fillRect(0, 0, 256, 20);
+			g.setColor(Color.white);
+			g.setFont(hudFont);
+			g.drawRect(0, 0, 256, 20);
+			g.drawString("GRADE: " + grade + " %", 0, 12);
+			g.drawString("YEAR: " + String.valueOf(((gsm.getPlatformerCourse() - 1)/gsm.getNumCourses() + 1)), hudsection * 3 + 15, 12);
+			g.drawString("COURSE: "  + String.valueOf(gsm.getPlatformerCourse()), hudsection * 6, 12);
+			//draw hud
+
+			if (levelFinished){
+				gradeTimer.cancel();
+				g.setColor(Color.black);
+				g.setFont(levelFinishedFont);
+				g.fillRect(0, 0, 256, 240);
+				g.setColor(Color.white);
+				
+				int platformer = gsm.getPlatformerCourse();
+				int courseNumber = gsm.getNumCourses();
+				
+				if (grade < 0)
+					grade = 0;
+				gsm.setPlatformerGrades(grade, platformer-1);
+				g.drawString("Year " +  String.valueOf(((gsm.getPlatformerCourse() - 1)/gsm.getNumCourses() + 1)), 70, 60);
+			
+
+				g.drawString("Course " + platformer + " Grade: " + grade, 70, 80);
+				DecimalFormat df = new DecimalFormat("#.##");
+				g.drawString("Overall GPA: " +  String.valueOf(df.format(gsm.getGPA(platformer))), 70, 100);
+				
+				font = new Font ("Arial", Font.PLAIN, 10);
+				g.setFont(font);
+				g.drawString("Press ' Enter ' to continue", 70, 150);
+
+			}
+		
+		}
+		
+		public  void keyPressed(int k) {
+			if (k == KeyEvent.VK_LEFT && !lockPlayer) player.setLeft(true);
+			if (k == KeyEvent.VK_RIGHT && !lockPlayer) player.setRight(true);
+			if (k == KeyEvent.VK_UP && !lockPlayer) player.setUp(true);
+			if (k == KeyEvent.VK_DOWN && !lockPlayer) player.setDown(true);
+			if (k == KeyEvent.VK_W && !lockPlayer ) {player.setJumping(true);
+			}
+			if (k == KeyEvent.VK_E && !lockPlayer) {
+				player.setScratching();
+				player.setFiring();
+				player.checkAttack(enemies);
+			}
+			if (k == KeyEvent.VK_ENTER ) {
+				if (levelFinished){
+					skipSplash = true;
+				}
+			}
+			if (k == KeyEvent.VK_F1)	levelFinished = true;
+		}
+		
+		public  void keyReleased(int k) {
+			if (k == KeyEvent.VK_LEFT ) player.setLeft(false);
+			if (k == KeyEvent.VK_RIGHT ) player.setRight(false);
+			if (k == KeyEvent.VK_UP ) player.setUp(false);
+			if (k == KeyEvent.VK_DOWN ) player.setDown(false);
+			if (k == KeyEvent.VK_W ) player.setJumping(false);
+		}
+}

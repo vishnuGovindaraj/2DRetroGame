@@ -1,0 +1,49 @@
+10
+
+dir
+77
+https://svn.code.sf.net/p/cpsc5992dgame/code/CPSC599Game/Resources
+https://svn.code.sf.net/p/cpsc5992dgame/code
+
+
+
+2014-04-10T19:48:09.389523Z
+77
+flamnihindu
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+1a59e674-aea5-4227-8f49-a8581471b708
+
+Backgrounds
+dir
+
+HUD
+dir
+
+Maps
+dir
+
+Music
+dir
+
+SFX
+dir
+
+Sprites
+dir
+
+Tilesets
+dir
+

@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/p/cpsc5992dgame/code/!svn/ver/12/CPSC599Game/Resources/SFX
+END
+jump.mp3
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/p/cpsc5992dgame/code/!svn/ver/12/CPSC599Game/Resources/SFX/jump.mp3
+END
+attack.wav
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/p/cpsc5992dgame/code/!svn/ver/80/CPSC599Game/Resources/SFX/attack.wav
+END
+enemyDeath.wav
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/p/cpsc5992dgame/code/!svn/ver/80/CPSC599Game/Resources/SFX/enemyDeath.wav
+END
+attack.mp3
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/p/cpsc5992dgame/code/!svn/ver/81/CPSC599Game/Resources/SFX/attack.mp3
+END
+scratch.mp3
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/p/cpsc5992dgame/code/!svn/ver/12/CPSC599Game/Resources/SFX/scratch.mp3
+END
+pickup.mp3
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/p/cpsc5992dgame/code/!svn/ver/80/CPSC599Game/Resources/SFX/pickup.mp3
+END
+enemyDeath.mp3
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/p/cpsc5992dgame/code/!svn/ver/81/CPSC599Game/Resources/SFX/enemyDeath.mp3
+END
+explode.wav
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/p/cpsc5992dgame/code/!svn/ver/80/CPSC599Game/Resources/SFX/explode.wav
+END

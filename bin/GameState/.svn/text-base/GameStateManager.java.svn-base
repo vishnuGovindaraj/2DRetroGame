@@ -1,0 +1,281 @@
+package GameState;
+
+import java.awt.Point;
+import java.util.ArrayList;
+
+import FinalStages.*;
+import PlatformerStages.*;
+import TransitionStages.*;
+
+public class GameStateManager {
+	
+	private GameState[] gameStates;
+	private int currentState;
+	private int[] platformerGrades ;
+	private int[] finalGrades;
+
+	 
+	
+	private String character = "/Sprites/Player/cpscplayermale.gif";
+	
+	public static final int NUMGAMESTATES = 5;
+	public static final int MENUSTATE = 0;
+	public static final int PLATFORMERSTATE1 = 1;
+	public static final int TRANSITIONSTATE1 = 2;
+	public static final int FINALSTATE1 = 3;
+	public static final int SELECTCHARACTER = 4;
+
+	//the initial platformer course to start from
+	private int platformerCourse = 1;
+	private int finalCourse = 1;
+	private int numCourses = 2;
+	private int numYears = 4;
+	private int penalty;
+	
+	private int grade;
+	private int score;
+	
+	
+	
+	private int transPlayerX  = 25; 
+	private int transPlayerY = 25;
+	private static final double PLATFORMERWEIGHT = 0.7;
+	private static final double FINALWEIGHT = 0.3;
+
+	
+	
+	private int[][] attributes = {
+			{6,4,2},
+			{2,6,4},
+			{2,4,6}};
+	
+	private String[] platformerMaps = {"/Maps/course_1.txt", "/Maps/course_2.txt", "/Maps/course_3.txt", "/Maps/course_4.txt", "/Maps/course_5.txt", "/Maps/course_8.txt", "/Maps/course_9.txt", "/Maps/course_10.txt"
+	};
+	
+	private String[] tilesets = {"/Tilesets/falltileset.gif", "/Tilesets/falltileset.gif", "/Tilesets/falltileset.gif", "/Tilesets/wintertileset.gif", "/Tilesets/wintertileset.gif", "/Tilesets/falltileset.gif", "/Tilesets/falltileset.gif","/Tilesets/wintertileset.gif"
+	};
+	
+	private String[] backgrounds = {"/Backgrounds/bluebg.gif", "/Backgrounds/bluebg.gif", "/Backgrounds/blackbg.gif",  "/Backgrounds/bluebg.gif", "/Backgrounds/blackbg.gif", "/Backgrounds/blackbg.gif", "/Backgrounds/bluebg.gif", "/Backgrounds/blackbg.gif"
+	};
+	
+	
+	/*
+	 *   
+	 */
+	public GameStateManager () {
+		 
+		
+		gameStates = new GameState[NUMGAMESTATES];
+		currentState = MENUSTATE;
+		loadState(currentState);
+		platformerGrades = new int[getNumYears() * numCourses];
+		finalGrades = new int[getNumYears()];
+		for (int i = 0; i < getNumYears(); i ++){
+			finalGrades[i] = 100;
+		}
+
+		
+	}
+
+	public void resetGame() {
+		platformerCourse = 1;
+		finalCourse = 1;
+		numCourses = 2;
+		numYears = 4;
+	}
+
+	public void loadState(int state) {
+		if (getPlatformerCourse() >= numCourses * numYears) {
+		}
+
+		if (state == MENUSTATE)
+			gameStates[state] = new MenuState(this);
+		if (state == PLATFORMERSTATE1)
+			gameStates[state] = new PlatformerState1(this, character,
+					getPlatformerCourse(), attributes);
+		currentState = state;
+		if (state == TRANSITIONSTATE1)
+			gameStates[state] = new TransitionState1(this, character,
+					getPlatformerCourse());
+		if (state == FINALSTATE1)
+			gameStates[state] = new FinalState1(this, character,
+					getFinalCourse());
+		if (state == SELECTCHARACTER)
+			gameStates[state] = new SelectCharacterState(this);
+	}
+	private void unloadState(int state){
+		gameStates[state] = null;
+	}
+	public void setState(int state){
+		unloadState(currentState);
+		currentState = state;
+		loadState(currentState);
+		//gameStates[currentState].init();
+	}
+
+	public void setCharacter(String c){
+		character = c;
+	}
+	
+	public void update(){
+		try{
+		gameStates[currentState].update();
+		}
+		catch(Exception e){}
+	}
+	
+	public void draw(java.awt.Graphics2D g){
+		try{
+			gameStates[currentState].draw(g);
+		} catch(Exception e){}
+	}
+	
+	public void keyPressed(int k){
+		try {
+			gameStates[currentState].keyPressed(k);
+		}
+			catch(NullPointerException e){
+			
+		}
+	}
+	public void keyReleased(int k){
+		try{
+			gameStates[currentState].keyReleased(k);
+		}
+			catch(NullPointerException e){
+			
+		}
+	}
+
+	public int getGrade() {
+		// TODO Auto-generated method stub
+		return grade;
+	}
+	public void setGrade(int g) {
+		// TODO Auto-generated method stub
+		grade = g;
+	}
+
+	public int getScore() {
+		// TODO Auto-generated method stub
+		return score;
+	}
+	public void setScore(int s) {
+		// TODO Auto-generated method stub
+		score = s;
+	}
+
+	public void gradeDec(int i) {
+		grade -= i;
+		
+	}
+
+	public void saveTransPosition(Point p) {
+		transPlayerX = p.x;
+		transPlayerY = p.y;
+		
+	}
+	public Point getTransPosition() {
+		Point p = new Point(transPlayerX, transPlayerY);
+		return p;
+		
+	}
+
+	public int getPlatformerCourse() {
+		return platformerCourse;
+	}
+
+	public void setPlatformerCourse(int platformerCourse) {
+		this.platformerCourse = platformerCourse;
+	}
+
+
+
+	public int getFinalCourse() {
+		return finalCourse;
+	}
+
+	public void setFinalCourse(int finalCourse) {
+		this.finalCourse = finalCourse;
+	}
+
+	public int getNumCourses() {
+		return numCourses;
+	}
+
+	public void setNumCourses(int numCourses) {
+		this.numCourses = numCourses;
+	}
+	
+	public int getPlatformerGrades(int i){
+		return platformerGrades[i];
+	}
+	
+	public void setPlatformerGrades(int g, int i){
+		platformerGrades[i] = g;
+	}
+	
+	public int getFinalGrades(int i){
+		return finalGrades[i];
+	}
+	
+	public void setFinalGrades(int g, int i){
+		finalGrades[i] = g;
+	}
+	
+
+	public double getGPA(int c){
+		int pSum = 0;
+		int fSum = 0;
+		for (int i = 0; i < c; i++){
+			pSum += platformerGrades[i];
+		}
+		int pGrade = pSum / c;
+		
+		for (int i = 0;i <= (c - 1)/numCourses; i++){
+			fSum += finalGrades[i];
+		}
+		
+		int fGrade = fSum / ((c - 1)/numCourses + 1);
+		
+
+		return ( 4*(pGrade * PLATFORMERWEIGHT + fGrade * FINALWEIGHT) / 100 );
+
+		
+
+	}
+
+	public int getPenalty() {
+		return penalty;
+	}
+
+	public void setPenalty(int penalty) {
+		this.penalty = penalty;
+	}
+
+	public void setCharacterAttributes(int[][] attributes) {
+		this.attributes = attributes;
+		
+	}
+
+	public int getNumYears() {
+		return numYears;
+	}
+
+	public void setNumYears(int numYears) {
+		this.numYears = numYears;
+	}
+	
+	public String getPlatformerMap(int i)
+	{
+		return platformerMaps[i];
+	}
+	public String getTileset(int i)
+	{
+		return tilesets[i];
+	}
+	public String getBackgrounds(int i)
+	{
+		return backgrounds[i];
+	}
+}
