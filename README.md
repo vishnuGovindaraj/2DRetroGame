@@ -1,6 +1,6 @@
 [//]: # (Image References)
 
-[image1]: ./Resources/Backgrounds/Gradepoint2.png 
+[image1]: ./Resources/Backgrounds/GradePoint2.png 
 [image2]: ./Resources/Backgrounds/mode1.png  
 [image3]: ./Resources/Backgrounds/mode2.png 
 [image4]: ./Resources/Backgrounds/mode3.png 
