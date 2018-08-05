@@ -1,10 +1,10 @@
 [//]: # (Image References)
 
-[image1]: ./Resources/Backgrounds/GradePoint2.png =250x
-[image2]: ./Resources/Backgrounds/mode1.png  =250x
-[image3]: ./Resources/Backgrounds/mode2.png =250x
-[image4]: ./Resources/Backgrounds/mode3.png =250x
-[image5]: ./Resources/Backgrounds/characterselect.png =250x
+[image1]: ./Resources/Backgrounds/GradePoint2.png 
+[image2]: ./Resources/Backgrounds/mode1.png 
+[image3]: ./Resources/Backgrounds/mode2.png
+[image4]: ./Resources/Backgrounds/mode3.png 
+[image5]: ./Resources/Backgrounds/characterselect.png 
 
 ## Grade-Point
 2D Platformer. Get the highest GPA possible by playing through different modes resembling a university experience.
