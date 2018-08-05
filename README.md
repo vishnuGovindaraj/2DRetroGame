@@ -1,3 +1,5 @@
+[//]: # (Image References)
+
 [image1]: ./Resources/Background/Gradepoint2.png 
 [image2]: ./Resources/Background/mode1.png 
 [image3]: ./Resources/Background/mode2.png 
@@ -10,8 +12,6 @@
 ![alt text][image1]
 
 You can download the executable Jar from [here](http://www.vishnuraj.ca/GradePoint.jar)
-
-
 
 
 ### Dependencies
