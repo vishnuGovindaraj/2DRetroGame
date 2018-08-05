@@ -9,7 +9,7 @@
 ## Grade-Point
 2D Platformer. Get the highest GPA possible by playing through different modes resembling a university experience.
 
-![test image size](/Resources/Backgrounds/GradePoint2.png ){:height="50%" width="50%"}
+![very good|800x600,20%](./Resources/Backgrounds/GradePoint2.png)
 
 You can download the executable Jar from [here](http://www.vishnuraj.ca/GradePoint.jar)
 
